@@ -1,0 +1,10 @@
+## requirements.txt
+
+# IFC-OpenShell core with MySQL support
+ifcopenshell==0.8.2
+
+# Pure-Python MySQL connector (no pkg-config needed)
+mysql-connector-python
+
+# The ifcpatch recipes module (subdirectory inside the IFC-OpenShell monorepo)
+git+ssh://git@github.com/IfcOpenShell/IfcOpenShell.git@master#egg=ifcpatch&subdirectory=src/ifcpatch
