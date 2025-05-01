@@ -18,7 +18,7 @@ patcher = Patcher(
     file        = model,
     logger      = logger,
     sql_type    = "SQLite",
-    database    = "ifcdb.sqlite",
+    database    = "ifcdb_raw.sqlite",
     full_schema = False,
     # …
 )
