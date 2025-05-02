@@ -1,0 +1,17 @@
+# Ignore MySQL datafiles
+/mysql-data/
+
+# Ignore SQLite & raw DB files
+*.sqlite
+*.db
+ifcdb_raw.*
+
+# Ignore IDE and OS cruft
+.DS_Store
+__pycache__/
+/*.pyc
+
+# Ignore your cloned IfcOpenShell repo
+IfcOpenShell/
+
+# (Add any other local‐only files here)
