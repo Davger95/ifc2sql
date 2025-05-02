@@ -1,140 +1,224 @@
-PRAGMA foreign_keys = ON;  -- (SQLite only; ensures FKs are enforced)
 
--- IFC core entities
 CREATE TABLE IfcBuildingStorey (
-  GlobalId TEXT PRIMARY KEY,
-  Name     TEXT
-);
+  GlobalId       VARCHAR(36)   NOT NULL,
+  Name           VARCHAR(255),
+  PRIMARY KEY (GlobalId)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IfcSpace (
-  GlobalId TEXT PRIMARY KEY,
-  Name     TEXT,
-  StoreyId TEXT NOT NULL,
+  GlobalId       VARCHAR(36)   NOT NULL,
+  Name           VARCHAR(255),
+  StoreyId       VARCHAR(36)   NOT NULL,
+  PRIMARY KEY (GlobalId),
   FOREIGN KEY (StoreyId) REFERENCES IfcBuildingStorey (GlobalId)
-);
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IfcWall (
-  GlobalId TEXT PRIMARY KEY,
-  Name     TEXT,
-  SpaceId  TEXT NOT NULL,
+  GlobalId       VARCHAR(36)   NOT NULL,
+  Name           VARCHAR(255),
+  SpaceId        VARCHAR(36)   NOT NULL,
+  PRIMARY KEY (GlobalId),
   FOREIGN KEY (SpaceId) REFERENCES IfcSpace (GlobalId)
-);
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IfcDoor (
-  GlobalId TEXT PRIMARY KEY,
-  Name     TEXT,
-  SpaceId  TEXT NOT NULL,
+  GlobalId       VARCHAR(36)   NOT NULL,
+  Name           VARCHAR(255),
+  SpaceId        VARCHAR(36)   NOT NULL,
+  PRIMARY KEY (GlobalId),
   FOREIGN KEY (SpaceId) REFERENCES IfcSpace (GlobalId)
-);
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IfcWindow (
-  GlobalId TEXT PRIMARY KEY,
-  Name     TEXT,
-  SpaceId  TEXT NOT NULL,
+  GlobalId       VARCHAR(36)   NOT NULL,
+  Name           VARCHAR(255),
+  SpaceId        VARCHAR(36)   NOT NULL,
+  PRIMARY KEY (GlobalId),
   FOREIGN KEY (SpaceId) REFERENCES IfcSpace (GlobalId)
-);
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 -- Lighting fixtures
 CREATE TABLE IfcLightFixtureType (
-  GlobalId        TEXT PRIMARY KEY,
-  Name            TEXT,
-  Wattage         INTEGER,
-  ColorTemp       INTEGER,
-  ReplaceCycleDays INTEGER
-);
+  GlobalId        VARCHAR(36)   NOT NULL,
+  Name            VARCHAR(255),
+  Wattage         INT,
+  ColorTemp       INT,
+  ReplaceCycleDays INT,
+  PRIMARY KEY (GlobalId)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IfcLightFixture (
-  GlobalId    TEXT PRIMARY KEY,
-  Name        TEXT,
-  SpaceId     TEXT NOT NULL,
-  FixtureType TEXT NOT NULL,
-  FOREIGN KEY (SpaceId)    REFERENCES IfcSpace (GlobalId),
-  FOREIGN KEY (FixtureType) REFERENCES IfcLightFixtureType (GlobalId)
-);
+  GlobalId    VARCHAR(36)   NOT NULL,
+  Name        VARCHAR(255),
+  SpaceId     VARCHAR(36)   NOT NULL,
+  FixtureType VARCHAR(36)   NOT NULL,
+  PRIMARY KEY (GlobalId),
+  FOREIGN KEY (SpaceId)    REFERENCES IfcSpace              (GlobalId)
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT,
+  FOREIGN KEY (FixtureType) REFERENCES IfcLightFixtureType   (GlobalId)
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 -- Other MEP assets
 CREATE TABLE IfcAirTerminal (
-  GlobalId TEXT PRIMARY KEY,
-  Name     TEXT,
-  SpaceId  TEXT NOT NULL,
+  GlobalId VARCHAR(36)   NOT NULL,
+  Name     VARCHAR(255),
+  SpaceId  VARCHAR(36)   NOT NULL,
+  PRIMARY KEY (GlobalId),
   FOREIGN KEY (SpaceId) REFERENCES IfcSpace (GlobalId)
-);
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IfcPump (
-  GlobalId TEXT PRIMARY KEY,
-  Name     TEXT,
-  SpaceId  TEXT NOT NULL,
+  GlobalId VARCHAR(36)   NOT NULL,
+  Name     VARCHAR(255),
+  SpaceId  VARCHAR(36)   NOT NULL,
+  PRIMARY KEY (GlobalId),
   FOREIGN KEY (SpaceId) REFERENCES IfcSpace (GlobalId)
-);
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IfcEnergyConversionDevice (
-  GlobalId TEXT PRIMARY KEY,
-  Name     TEXT,
-  SpaceId  TEXT NOT NULL,
+  GlobalId VARCHAR(36)   NOT NULL,
+  Name     VARCHAR(255),
+  SpaceId  VARCHAR(36)   NOT NULL,
+  PRIMARY KEY (GlobalId),
   FOREIGN KEY (SpaceId) REFERENCES IfcSpace (GlobalId)
-);
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IfcFlowController (
-  GlobalId TEXT PRIMARY KEY,
-  Name     TEXT,
-  SpaceId  TEXT NOT NULL,
+  GlobalId VARCHAR(36)   NOT NULL,
+  Name     VARCHAR(255),
+  SpaceId  VARCHAR(36)   NOT NULL,
+  PRIMARY KEY (GlobalId),
   FOREIGN KEY (SpaceId) REFERENCES IfcSpace (GlobalId)
-);
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IfcFlowTerminal (
-  GlobalId TEXT PRIMARY KEY,
-  Name     TEXT,
-  SpaceId  TEXT NOT NULL,
+  GlobalId VARCHAR(36)   NOT NULL,
+  Name     VARCHAR(255),
+  SpaceId  VARCHAR(36)   NOT NULL,
+  PRIMARY KEY (GlobalId),
   FOREIGN KEY (SpaceId) REFERENCES IfcSpace (GlobalId)
-);
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 -- Consolidated distribution systems
 CREATE TABLE IfcDistributionSystem (
-  GlobalId     TEXT PRIMARY KEY,
-  Name         TEXT,
-  SpaceId      TEXT NOT NULL,
-  SystemType   TEXT,
-  SegmentCount INTEGER,
+  GlobalId     VARCHAR(36)   NOT NULL,
+  Name         VARCHAR(255),
+  SpaceId      VARCHAR(36)   NOT NULL,
+  SystemType   VARCHAR(100),
+  SegmentCount INT,
+  PRIMARY KEY (GlobalId),
   FOREIGN KEY (SpaceId) REFERENCES IfcSpace (GlobalId)
-);
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 -- Classification
 CREATE TABLE Classification (
-  ClassId TEXT PRIMARY KEY,
-  Name    TEXT,
-  Source  TEXT
-);
+  ClassId VARCHAR(36)   NOT NULL,
+  Name    VARCHAR(255),
+  Source  VARCHAR(255),
+  PRIMARY KEY (ClassId)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE EntityClassification (
-  GlobalId TEXT NOT NULL,
-  ClassId  TEXT NOT NULL,
-  Relation TEXT,
+  GlobalId VARCHAR(36)   NOT NULL,
+  ClassId  VARCHAR(36)   NOT NULL,
+  Relation VARCHAR(100),
   PRIMARY KEY (GlobalId, ClassId),
-  FOREIGN KEY (GlobalId) REFERENCES IfcSpace       (GlobalId),
+  FOREIGN KEY (GlobalId) REFERENCES IfcSpace       (GlobalId)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
   FOREIGN KEY (ClassId)  REFERENCES Classification (ClassId)
-);
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 -- Property sets & properties
 CREATE TABLE Pset (
-  PsetId TEXT PRIMARY KEY,
-  Name   TEXT,
-  Source TEXT
-);
+  PsetId VARCHAR(36)   NOT NULL,
+  Name   VARCHAR(255),
+  Source VARCHAR(255),
+  PRIMARY KEY (PsetId)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE Property (
-  PropertyId TEXT PRIMARY KEY,
-  PsetId     TEXT NOT NULL,
-  Name       TEXT,
-  DataType   TEXT,
-  Unit       TEXT,
+  PropertyId VARCHAR(36)   NOT NULL,
+  PsetId     VARCHAR(36)   NOT NULL,
+  Name       VARCHAR(255),
+  DataType   VARCHAR(50),
+  Unit       VARCHAR(50),
+  PRIMARY KEY (PropertyId),
   FOREIGN KEY (PsetId) REFERENCES Pset (PsetId)
-);
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE EntityProperty (
-  GlobalId   TEXT NOT NULL,
-  PropertyId TEXT NOT NULL,
+  GlobalId   VARCHAR(36)   NOT NULL,
+  PropertyId VARCHAR(36)   NOT NULL,
   Value      TEXT,
   PRIMARY KEY (GlobalId, PropertyId),
-  FOREIGN KEY (GlobalId)   REFERENCES IfcSpace  (GlobalId),
+  FOREIGN KEY (GlobalId)   REFERENCES IfcSpace  (GlobalId)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
   FOREIGN KEY (PropertyId) REFERENCES Property   (PropertyId)
-);
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;

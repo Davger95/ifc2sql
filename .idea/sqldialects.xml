@@ -2,6 +2,6 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/sql/000_ERD.sql" dialect="Sybase" />
-    <file url="file://$PROJECT_DIR$/sql/001_schema.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql/001_schema.sql" dialect="SQLite" />
   </component>
 </project>
