@@ -1,117 +1,88 @@
--- Transform: load from staging CSV tables into production schema, including properties
+USE ifcdb;
 
--- 0) Disable FK checks for bulk inserts
+-- 0) Disable FKs & truncate all prod tables
 SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE IfcWindowProperty;
+TRUNCATE TABLE IfcDoorProperty;
+TRUNCATE TABLE IfcWallProperty;
+TRUNCATE TABLE IfcSpaceProperty;
+TRUNCATE TABLE IfcBuildingStoreyProperty;
+TRUNCATE TABLE IfcWindow;
+TRUNCATE TABLE IfcDoor;
+TRUNCATE TABLE IfcWall;
+TRUNCATE TABLE IfcSpace;
+TRUNCATE TABLE IfcBuildingStorey;
+TRUNCATE TABLE IfcProject;
 
--- 1) Building Storeys
-INSERT IGNORE INTO IfcBuildingStorey (GlobalId, Name)
-SELECT GlobalId, Name
-  FROM staging_IfcBuildingStorey;
-TRUNCATE TABLE staging_IfcBuildingStorey;
+-- 1) Projects
+INSERT IGNORE INTO IfcProject (GlobalId, Name)
+  SELECT DISTINCT s.ProjectGlobalId, s.ProjectName
+    FROM staging_IfcBuildingStorey AS s;
 
--- 1.a) BuildingStorey properties
+-- 2) Building‐storeys + props
+INSERT IGNORE INTO IfcBuildingStorey (GlobalId, Name, ProjectId)
+  SELECT s.GlobalId, s.Name, p.id
+    FROM staging_IfcBuildingStorey AS s
+    JOIN IfcProject AS p
+      ON p.GlobalId = s.ProjectGlobalId;
+
 INSERT IGNORE INTO IfcBuildingStoreyProperty (BuildingStoreyId, PSetName, PropName, PropValue)
-SELECT bs.id, p.PSetName, p.PropName, p.PropValue
-  FROM staging_IfcBuildingStorey_Properties p
-  JOIN IfcBuildingStorey bs
-    ON bs.GlobalId = p.EntityGlobalId;
-TRUNCATE TABLE staging_IfcBuildingStorey_Properties;
+  SELECT bs.id, pp.PSetName, pp.PropName, pp.PropValue
+    FROM staging_IfcBuildingStorey_Properties AS pp
+    JOIN IfcBuildingStorey AS bs
+      ON bs.GlobalId = pp.EntityGlobalId;
 
--- 2) Spaces
-INSERT IGNORE INTO IfcSpace (GlobalId, Name)
-SELECT GlobalId, Name
-  FROM staging_IfcSpace;
-TRUNCATE TABLE staging_IfcSpace;
+-- 3) Spaces + props
+INSERT IGNORE INTO IfcSpace (GlobalId, Name, StoreyId)
+  SELECT s.GlobalId, s.Name, bs.id
+    FROM staging_IfcSpace AS s
+    JOIN IfcBuildingStorey AS bs
+      ON bs.GlobalId = s.StoreyGlobalId;
 
--- 2.a) Space properties
 INSERT IGNORE INTO IfcSpaceProperty (SpaceId, PSetName, PropName, PropValue)
-SELECT s.id, p.PSetName, p.PropName, p.PropValue
-  FROM staging_IfcSpace_Properties p
-  JOIN IfcSpace s
-    ON s.GlobalId = p.EntityGlobalId;
-TRUNCATE TABLE staging_IfcSpace_Properties;
+  SELECT sp.id, p.PSetName, p.PropName, p.PropValue
+    FROM staging_IfcSpace_Properties AS p
+    JOIN IfcSpace AS sp
+      ON sp.GlobalId = p.EntityGlobalId;
 
--- 3) Walls
-INSERT IGNORE INTO IfcWall (GlobalId, Name)
-SELECT GlobalId, Name
-  FROM staging_IfcWall;
-TRUNCATE TABLE staging_IfcWall;
+-- 4) Walls + props
+INSERT IGNORE INTO IfcWall (GlobalId, Name, SpaceId)
+  SELECT w.GlobalId, w.Name, sp.id
+    FROM staging_IfcWall AS w
+    JOIN IfcSpace AS sp
+      ON sp.GlobalId = w.SpaceGlobalId;
 
--- 3.a) Wall properties
 INSERT IGNORE INTO IfcWallProperty (WallId, PSetName, PropName, PropValue)
-SELECT w.id, p.PSetName, p.PropName, p.PropValue
-  FROM staging_IfcWall_Properties p
-  JOIN IfcWall w
-    ON w.GlobalId = p.EntityGlobalId;
-TRUNCATE TABLE staging_IfcWall_Properties;
+  SELECT wlt.id, p.PSetName, p.PropName, p.PropValue
+    FROM staging_IfcWall_Properties AS p
+    JOIN IfcWall AS wlt
+      ON wlt.GlobalId = p.EntityGlobalId;
 
--- 4) Doors
-INSERT IGNORE INTO IfcDoor (GlobalId, Name)
-SELECT GlobalId, Name
-  FROM staging_IfcDoor;
-TRUNCATE TABLE staging_IfcDoor;
+-- 5) Doors + props
+INSERT IGNORE INTO IfcDoor (GlobalId, Name, SpaceId)
+  SELECT d.GlobalId, d.Name, sp.id
+    FROM staging_IfcDoor AS d
+    JOIN IfcSpace AS sp
+      ON sp.GlobalId = d.SpaceGlobalId;
 
--- 4.a) Door properties
 INSERT IGNORE INTO IfcDoorProperty (DoorId, PSetName, PropName, PropValue)
-SELECT d.id, p.PSetName, p.PropName, p.PropValue
-  FROM staging_IfcDoor_Properties p
-  JOIN IfcDoor d
-    ON d.GlobalId = p.EntityGlobalId;
-TRUNCATE TABLE staging_IfcDoor_Properties;
+  SELECT drt.id, p.PSetName, p.PropName, p.PropValue
+    FROM staging_IfcDoor_Properties AS p
+    JOIN IfcDoor AS drt
+      ON drt.GlobalId = p.EntityGlobalId;
 
--- 5) Windows
-INSERT IGNORE INTO IfcWindow (GlobalId, Name)
-SELECT GlobalId, Name
-  FROM staging_IfcWindow;
-TRUNCATE TABLE staging_IfcWindow;
+-- 6) Windows + props
+INSERT IGNORE INTO IfcWindow (GlobalId, Name, SpaceId)
+  SELECT w.GlobalId, w.Name, sp.id
+    FROM staging_IfcWindow AS w
+    JOIN IfcSpace AS sp
+      ON sp.GlobalId = w.SpaceGlobalId;
 
--- 5.a) Window properties
 INSERT IGNORE INTO IfcWindowProperty (WindowId, PSetName, PropName, PropValue)
-SELECT w.id, p.PSetName, p.PropName, p.PropValue
-  FROM staging_IfcWindow_Properties p
-  JOIN IfcWindow w
-    ON w.GlobalId = p.EntityGlobalId;
-TRUNCATE TABLE staging_IfcWindow_Properties;
+  SELECT wnw.id, p.PSetName, p.PropName, p.PropValue
+    FROM staging_IfcWindow_Properties AS p
+    JOIN IfcWindow AS wnw
+      ON wnw.GlobalId = p.EntityGlobalId;
 
--- 6) MaterialClass load & parent backfill
-INSERT IGNORE INTO MaterialClass (bsdd_id, class_name, parent_bsdd_id)
-SELECT bsdd_id, class_name, NULLIF(parent_id,'')
-  FROM staging_bsdd_materials;
-UPDATE MaterialClass c
-  JOIN MaterialClass p
-    ON c.parent_bsdd_id = p.bsdd_id
-SET c.parent_ClassId = p.ClassId
-WHERE c.parent_bsdd_id IS NOT NULL;
-TRUNCATE TABLE staging_bsdd_materials;
-
--- 7) Element→material staging
-CREATE TABLE IF NOT EXISTS staging_element_material_map (
-  EntityGlobalId VARCHAR(36),
-  ElementType    VARCHAR(50),
-  bsdd_id        VARCHAR(50)
-);
-LOAD DATA LOCAL INFILE '/path/to/map_all_elements.csv'
-INTO TABLE staging_element_material_map
-FIELDS TERMINATED BY ',' ENCLOSED BY '"' IGNORE 1 LINES
-  (EntityGlobalId, ElementType, bsdd_id);
-
--- 8) Link elements to classes
-INSERT IGNORE INTO IfcElement_MaterialClass (ElementType, ElementId, ClassId)
-SELECT
-  m.ElementType,
-  CASE m.ElementType
-    WHEN 'IfcBuildingStorey' THEN (SELECT id FROM IfcBuildingStorey WHERE GlobalId = m.EntityGlobalId)
-    WHEN 'IfcSpace'          THEN (SELECT id FROM IfcSpace          WHERE GlobalId = m.EntityGlobalId)
-    WHEN 'IfcWall'           THEN (SELECT id FROM IfcWall           WHERE GlobalId = m.EntityGlobalId)
-    WHEN 'IfcDoor'           THEN (SELECT id FROM IfcDoor           WHERE GlobalId = m.EntityGlobalId)
-    WHEN 'IfcWindow'         THEN (SELECT id FROM IfcWindow         WHERE GlobalId = m.EntityGlobalId)
-  END,
-  mc.ClassId
-FROM staging_element_material_map m
-JOIN MaterialClass mc
-  ON m.bsdd_id = mc.bsdd_id
-WHERE m.bsdd_id <> '';
-TRUNCATE TABLE staging_element_material_map;
-
--- 9) Re-enable FKs
+-- 7) Re‐enable FKs
 SET FOREIGN_KEY_CHECKS = 1;

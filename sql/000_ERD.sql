@@ -1,150 +1,102 @@
-// IFC core entities
+Table IfcProject {
+  id        int          [pk]
+  GlobalId  varchar(36)  [unique]
+  Name      varchar(255)
+}
+
+// IFC Core Entities
 Table IfcBuildingStorey {
-  GlobalId varchar [pk]   // primary key
-  Name     varchar
+  id         int          [pk]
+  GlobalId   varchar(36)  [unique]
+  Name       varchar(255)
+  ProjectId  int          [ref: > IfcProject.id]
 }
 
 Table IfcSpace {
-  GlobalId varchar [pk]
-  Name     varchar
-  StoreyId varchar
+   id        int         [pk]
+  GlobalId  varchar(36) [unique]
+  Name      varchar(255)
+  StoreyId  int         [ref: > IfcBuildingStorey.id]
 }
 
 Table IfcWall {
-  GlobalId varchar [pk]
-  Name     varchar
-  SpaceId  varchar
+  id         int            [pk]
+  GlobalId   varchar(36)    [unique]
+  Name       varchar(255)
+  SpaceId    int            [ref: > IfcSpace.id]
 }
 
-// Doors & Windows tied to Space
 Table IfcDoor {
-  GlobalId varchar [pk]
-  Name     varchar
-  SpaceId  varchar
+  id         int            [pk]
+  GlobalId   varchar(36)    [unique]
+  Name       varchar(255)
+  SpaceId    int            [ref: > IfcSpace.id]
 }
 
 Table IfcWindow {
-  GlobalId varchar [pk]
-  Name     varchar
-  SpaceId  varchar
+  id         int            [pk]
+  GlobalId   varchar(36)    [unique]
+  Name       varchar(255)
+  SpaceId    int            [ref: > IfcSpace.id]
 }
 
-// MEP entities all tied to Space
-
-
-Table IfcLightFixture {
-  GlobalId    varchar [pk]
-  Name        varchar
-  SpaceId     varchar
-  FixtureType varchar     // FK → IfcLightFixtureType.GlobalId
+// Material / Cost / Emission Lookups
+Table MaterialType {
+  id    int            [pk]
+  Name  varchar(255)
 }
 
-Table IfcLightFixtureType {
-  GlobalId    varchar [pk]
-  Name        varchar
-  Wattage     integer
-  ColorTemp   integer
-  ReplaceCycleDays integer  // typical replacement interval
+Table CostReference {
+  id    int            [pk]
+  Value decimal(12,2)
+  Unit  varchar(50)
 }
 
-Table IfcAirTerminal {
-  GlobalId varchar [pk]
-  Name     varchar
-  SpaceId  varchar
+Table EmissionReference {
+  id    int            [pk]
+  Value decimal(12,2)
+  Unit  varchar(50)
 }
 
-Table IfcPump {
-  GlobalId varchar [pk]
-  Name     varchar
-  SpaceId  varchar
+// Polymorphic Metrics Link
+Table ElementMetrics {
+  element_type         varchar(50)    [pk]  // 'IfcWall' | 'IfcDoor' | 'IfcWindow'
+  element_id           int            [pk]
+  material_type_id     int            [ref: > MaterialType.id]
+  cost_reference_id    int            [ref: > CostReference.id]
+  emission_reference_id int           [ref: > EmissionReference.id]
 }
 
-Table IfcEnergyConversionDevice {
-  GlobalId varchar [pk]
-  Name     varchar
-  SpaceId  varchar
-}
-
-Table IfcFlowController {
-  GlobalId varchar [pk]
-  Name     varchar
-  SpaceId  varchar
-}
-
-Table IfcFlowTerminal {
-  GlobalId varchar [pk]
-  Name     varchar
-  SpaceId  varchar
-}
-
-// *** Consolidated Distribution System ***
-Table IfcDistributionSystem {
-  GlobalId varchar [pk]   // each run/loop
-  Name     varchar
-  SpaceId  varchar
-  SystemType varchar         // e.g. 'HVAC-Duct', 'Water-Pipe'
-  SegmentCount  integer      // optional: number of segments in system
-}
-
-// Classification tables
+// Classification Module
 Table Classification {
-  ClassId varchar [pk]
-  Name    varchar
-  Source  varchar
+  ClassId varchar(36)   [pk]
+  Name    varchar(255)
+  Source  varchar(255)
 }
 
 Table EntityClassification {
-  GlobalId varchar
-  ClassId  varchar
-  Relation varchar
-  indexes {
-    (GlobalId, ClassId)
-  }
+  GlobalId varchar(36)   [pk]
+  ClassId  varchar(36)   [pk, ref: > Classification.ClassId]
+  Relation varchar(100)
 }
 
-// Property Sets & Properties
+// Property‐sets Module
 Table Pset {
-  PsetId varchar [pk]
-  Name   varchar
-  Source varchar
+  PsetId varchar(36)     [pk]
+  Name   varchar(255)
+  Source varchar(255)
 }
 
 Table Property {
-  PropertyId varchar [pk]
-  PsetId     varchar
-  Name       varchar
-  DataType   varchar
-  Unit       varchar
+  PropertyId varchar(36) [pk]
+  PsetId     varchar(36) [ref: > Pset.PsetId]
+  Name       varchar(255)
+  DataType   varchar(50)
+  Unit       varchar(50)
 }
 
 Table EntityProperty {
-  GlobalId   varchar
-  PropertyId varchar
-  Value      varchar
-  indexes {
-    (GlobalId, PropertyId)
-  }
+  GlobalId   varchar(36) [pk]
+  PropertyId varchar(36) [pk, ref: > Property.PropertyId]
+  Value      text
 }
-
-Ref: IfcSpace.StoreyId                   > IfcBuildingStorey.GlobalId
-
-Ref: IfcWall.SpaceId                     > IfcSpace.GlobalId
-Ref: IfcDoor.SpaceId                     > IfcSpace.GlobalId
-Ref: IfcWindow.SpaceId                   > IfcSpace.GlobalId
-
-Ref: IfcLightFixture.SpaceId         > IfcSpace.GlobalId
-Ref: IfcLightFixture.FixtureType     > IfcLightFixtureType.GlobalId
-Ref: IfcAirTerminal.SpaceId              > IfcSpace.GlobalId
-Ref: IfcPump.SpaceId                     > IfcSpace.GlobalId
-Ref: IfcEnergyConversionDevice.SpaceId   > IfcSpace.GlobalId
-Ref: IfcFlowController.SpaceId           > IfcSpace.GlobalId
-Ref: IfcFlowTerminal.SpaceId             > IfcSpace.GlobalId
-
-Ref: IfcDistributionSystem.SpaceId       > IfcSpace.GlobalId
-
-Ref: EntityClassification.GlobalId       > IfcSpace.GlobalId   // or other IFC tables as needed
-Ref: EntityClassification.ClassId        > Classification.ClassId
-
-Ref: Property.PsetId                     > Pset.PsetId
-Ref: EntityProperty.GlobalId             > IfcSpace.GlobalId   // or Any IFC table.GlobalId
-Ref: EntityProperty.PropertyId           > Property.PropertyId

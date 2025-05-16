@@ -5,9 +5,11 @@ USE ifcdb;
 -- ===================================================================
 DROP TABLE IF EXISTS staging_IfcBuildingStorey;
 CREATE TABLE staging_IfcBuildingStorey (
-  id           INT AUTO_INCREMENT PRIMARY KEY,
-  GlobalId     VARCHAR(64),
-  Name         VARCHAR(255)
+  id               INT AUTO_INCREMENT PRIMARY KEY,
+  GlobalId         VARCHAR(36),
+  Name             VARCHAR(255),
+  ProjectGlobalId  VARCHAR(36),
+  ProjectName      VARCHAR(255)  -- if you need to capture the project’s Name
 );
 
 DROP TABLE IF EXISTS staging_IfcBuildingStorey_Properties;
@@ -19,13 +21,14 @@ CREATE TABLE staging_IfcBuildingStorey_Properties (
   PropValue      VARCHAR(255)
 );
 
--- Repeat for each class:
 DROP TABLE IF EXISTS staging_IfcSpace;
 CREATE TABLE staging_IfcSpace (
-  id       INT AUTO_INCREMENT PRIMARY KEY,
-  GlobalId VARCHAR(64),
-  Name     VARCHAR(255)
+  id              INT AUTO_INCREMENT PRIMARY KEY,
+  GlobalId        VARCHAR(64),
+  Name            VARCHAR(255),
+  StoreyGlobalId  VARCHAR(64)
 );
+
 DROP TABLE IF EXISTS staging_IfcSpace_Properties;
 CREATE TABLE staging_IfcSpace_Properties (
   id             INT AUTO_INCREMENT PRIMARY KEY,
@@ -37,10 +40,12 @@ CREATE TABLE staging_IfcSpace_Properties (
 
 DROP TABLE IF EXISTS staging_IfcWall;
 CREATE TABLE staging_IfcWall (
-  id       INT AUTO_INCREMENT PRIMARY KEY,
-  GlobalId VARCHAR(64),
-  Name     VARCHAR(255)
+  id             INT AUTO_INCREMENT PRIMARY KEY,
+  GlobalId       VARCHAR(64),
+  Name           VARCHAR(255),
+  SpaceGlobalId  VARCHAR(64)
 );
+
 DROP TABLE IF EXISTS staging_IfcWall_Properties;
 CREATE TABLE staging_IfcWall_Properties (
   id             INT AUTO_INCREMENT PRIMARY KEY,
@@ -52,10 +57,12 @@ CREATE TABLE staging_IfcWall_Properties (
 
 DROP TABLE IF EXISTS staging_IfcDoor;
 CREATE TABLE staging_IfcDoor (
-  id       INT AUTO_INCREMENT PRIMARY KEY,
-  GlobalId VARCHAR(64),
-  Name     VARCHAR(255)
+  id             INT AUTO_INCREMENT PRIMARY KEY,
+  GlobalId       VARCHAR(64),
+  Name           VARCHAR(255),
+  SpaceGlobalId  VARCHAR(64)
 );
+
 DROP TABLE IF EXISTS staging_IfcDoor_Properties;
 CREATE TABLE staging_IfcDoor_Properties (
   id             INT AUTO_INCREMENT PRIMARY KEY,
@@ -67,10 +74,12 @@ CREATE TABLE staging_IfcDoor_Properties (
 
 DROP TABLE IF EXISTS staging_IfcWindow;
 CREATE TABLE staging_IfcWindow (
-  id       INT AUTO_INCREMENT PRIMARY KEY,
-  GlobalId VARCHAR(64),
-  Name     VARCHAR(255)
+  id             INT AUTO_INCREMENT PRIMARY KEY,
+  GlobalId       VARCHAR(64),
+  Name           VARCHAR(255),
+  SpaceGlobalId  VARCHAR(64)
 );
+
 DROP TABLE IF EXISTS staging_IfcWindow_Properties;
 CREATE TABLE staging_IfcWindow_Properties (
   id             INT AUTO_INCREMENT PRIMARY KEY,
@@ -80,67 +89,93 @@ CREATE TABLE staging_IfcWindow_Properties (
   PropValue      VARCHAR(255)
 );
 
-DELIMITER $$
-CREATE PROCEDURE load_all_staging()
-BEGIN
-  DECLARE cls         VARCHAR(64);
-  DECLARE done_main   INT DEFAULT 0;
-  DECLARE skip_err    INT DEFAULT 0;
 
-  -- Cursor over your five classes
-  DECLARE cur CURSOR FOR
-    SELECT class_name FROM (
-      SELECT 'IfcBuildingStorey' AS class_name UNION ALL
-      SELECT 'IfcSpace'             UNION ALL
-      SELECT 'IfcWall'              UNION ALL
-      SELECT 'IfcDoor'              UNION ALL
-      SELECT 'IfcWindow'
-    ) AS classes;
+-- ===================================================================
+-- 2) Load each CSV into its staging table
+--    note the explicit column lists below
+-- ===================================================================
 
-  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done_main = 1;
+-- BuildingStorey (has 3 columns in CSV: GlobalId,Name,ProjectGlobalId)
+LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/IfcBuildingStorey.csv'
+  INTO TABLE staging_IfcBuildingStorey
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\r\n'
+  IGNORE 1 LINES
+  (GlobalId, Name, ProjectGlobalId, ProjectName);
 
-  OPEN cur;
-  main_loop: LOOP
-    FETCH cur INTO cls;
-    IF done_main THEN 
-      LEAVE main_loop; 
-    END IF;
+-- BuildingStorey properties (4 columns)
+LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/IfcBuildingStorey_Properties.csv'
+  INTO TABLE staging_IfcBuildingStorey_Properties
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\r\n'
+  IGNORE 1 LINES
+  (EntityGlobalId, PSetName, PropName, PropValue);
 
-    -- 2.a) Load the main <Class>.csv
-    SET @tbl  = CONCAT('staging_', cls);
-    SET @file = CONCAT('C:/Users/irmakoezarslan/Documents/IFCproject/ifc2sql/ifc_output_CSV/',
-                       cls, '.csv');
-    SET @sql  = CONCAT(
-      "LOAD DATA LOCAL INFILE '", @file, "' INTO TABLE ", @tbl,
-      " FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'",
-      " LINES TERMINATED BY '\\n' IGNORE 1 LINES;"
-    );
-    PREPARE stmt FROM @sql;
-    EXECUTE stmt;
-    DEALLOCATE PREPARE stmt;
+-- Space (GlobalId,Name,StoreyGlobalId)
+LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/IfcSpace.csv'
+  INTO TABLE staging_IfcSpace
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\r\n'
+  IGNORE 1 LINES
+  (GlobalId, Name, StoreyGlobalId);
 
-    -- 2.b) Load the <Class>_Properties.csv, but skip if missing
-    SET @prop_tbl  = CONCAT('staging_', cls, '_Properties');
-    SET @prop_file = CONCAT('C:/Users/irmakoezarslan/Documents/IFCproject/ifc2sql/ifc_output_CSV/',
-                            cls, '_Properties.csv');
-    BEGIN
-      DECLARE CONTINUE HANDLER FOR SQLSTATE 'HY000' SET skip_err = 1;
-      SET skip_err = 0;
-      SET @sql = CONCAT(
-        "LOAD DATA LOCAL INFILE '", @prop_file, "' INTO TABLE ", @prop_tbl,
-        " FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'",
-        " LINES TERMINATED BY '\\n' IGNORE 1 LINES;"
-      );
-      PREPARE stmt2 FROM @sql;
-      EXECUTE stmt2;
-      DEALLOCATE PREPARE stmt2;
-      -- if skip_err=1, the file or table wasn’t there, but we just continue
-    END;
+-- Space properties
+LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/IfcSpace_Properties.csv'
+  INTO TABLE staging_IfcSpace_Properties
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\r\n'
+  IGNORE 1 LINES
+  (EntityGlobalId, PSetName, PropName, PropValue);
 
-  END LOOP;
-  CLOSE cur;
-END$$
-DELIMITER ;
+-- Wall (GlobalId,Name,SpaceGlobalId)
+LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/IfcWall.csv'
+  INTO TABLE staging_IfcWall
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\r\n'
+  IGNORE 1 LINES
+  (GlobalId, Name, SpaceGlobalId);
 
+-- Wall properties
+LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/IfcWall_Properties.csv'
+  INTO TABLE staging_IfcWall_Properties
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\r\n'
+  IGNORE 1 LINES
+  (EntityGlobalId, PSetName, PropName, PropValue);
 
-CALL load_all_staging();
+-- Door (GlobalId,Name,SpaceGlobalId)
+LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/IfcDoor.csv'
+  INTO TABLE staging_IfcDoor
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\r\n'
+  IGNORE 1 LINES
+  (GlobalId, Name, SpaceGlobalId);
+
+-- Door properties
+LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/IfcDoor_Properties.csv'
+  INTO TABLE staging_IfcDoor_Properties
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\r\n'
+  IGNORE 1 LINES
+  (EntityGlobalId, PSetName, PropName, PropValue);
+
+-- Window (GlobalId,Name,SpaceGlobalId)
+LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/IfcWindow.csv'
+  INTO TABLE staging_IfcWindow
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\r\n'
+  IGNORE 1 LINES
+  (GlobalId, Name, SpaceGlobalId);
+
+-- Window properties
+LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/IfcWindow_Properties.csv'
+  INTO TABLE staging_IfcWindow_Properties
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\r\n'
+  IGNORE 1 LINES
+  (EntityGlobalId, PSetName, PropName, PropValue);
+
+-- ===================================================================
+-- 3) (Optional) call transformation proc or proceed manually
+-- ===================================================================
+-- CALL load_all_staging();

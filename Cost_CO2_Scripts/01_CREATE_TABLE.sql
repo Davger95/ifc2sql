@@ -1,0 +1,596 @@
+SHOW GLOBAL VARIABLES LIKE 'local_infile';
+SET GLOBAL local_infile = TRUE;
+SHOW VARIABLES LIKE 'max_allowed_packet';
+SET NAMES 'utf8mb4';
+ALTER DATABASE material_price CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+
+USE material_price;
+CREATE TABLE staging_table(
+	product_code INT AUTO_INCREMENT PRIMARY KEY,
+	material_name CHAR(255),
+	dec_2002 FLOAT,
+	jan_2003 FLOAT,
+	feb_2003 FLOAT,
+mar_2003 FLOAT,
+apr_2003 FLOAT,
+may_2003 FLOAT,
+jun_2003 FLOAT,
+jul_2003 FLOAT,
+aug_2003 FLOAT,
+sep_2003 FLOAT,
+oct_2003 FLOAT,
+nov_2003 FLOAT,
+dec_2003 FLOAT,
+jan_2004 FLOAT,
+feb_2004 FLOAT,
+mar_2004 FLOAT,
+apr_2004 FLOAT,
+may_2004 FLOAT,
+jun_2004 FLOAT,
+jul_2004 FLOAT,
+aug_2004 FLOAT,
+sep_2004 FLOAT,
+oct_2004 FLOAT,
+nov_2004 FLOAT,
+dec_2004 FLOAT,
+jan_2005 FLOAT,
+feb_2005 FLOAT,
+mar_2005 FLOAT,
+apr_2005 FLOAT,
+may_2005 FLOAT,
+jun_2005 FLOAT,
+jul_2005 FLOAT,
+aug_2005 FLOAT,
+sep_2005 FLOAT,
+oct_2005 FLOAT,
+nov_2005 FLOAT,
+dec_2005 FLOAT,
+jan_2006 FLOAT,
+feb_2006 FLOAT,
+mar_2006 FLOAT,
+apr_2006 FLOAT,
+may_2006 FLOAT,
+jun_2006 FLOAT,
+jul_2006 FLOAT,
+aug_2006 FLOAT,
+sep_2006 FLOAT,
+oct_2006 FLOAT,
+nov_2006 FLOAT,
+dec_2006 FLOAT,
+jan_2007 FLOAT,
+feb_2007 FLOAT,
+mar_2007 FLOAT,
+apr_2007 FLOAT,
+may_2007 FLOAT,
+jun_2007 FLOAT,
+jul_2007 FLOAT,
+aug_2007 FLOAT,
+sep_2007 FLOAT,
+oct_2007 FLOAT,
+nov_2007 FLOAT,
+dec_2007 FLOAT,
+jan_2008 FLOAT,
+feb_2008 FLOAT,
+mar_2008 FLOAT,
+apr_2008 FLOAT,
+may_2008 FLOAT,
+jun_2008 FLOAT,
+jul_2008 FLOAT,
+aug_2008 FLOAT,
+sep_2008 FLOAT,
+oct_2008 FLOAT,
+nov_2008 FLOAT,
+dec_2008 FLOAT,
+jan_2009 FLOAT,
+feb_2009 FLOAT,
+mar_2009 FLOAT,
+apr_2009 FLOAT,
+may_2009 FLOAT,
+jun_2009 FLOAT,
+jul_2009 FLOAT,
+aug_2009 FLOAT,
+sep_2009 FLOAT,
+oct_2009 FLOAT,
+nov_2009 FLOAT,
+dec_2009 FLOAT,
+jan_2010 FLOAT,
+feb_2010 FLOAT,
+mar_2010 FLOAT,
+apr_2010 FLOAT,
+may_2010 FLOAT,
+jun_2010 FLOAT,
+jul_2010 FLOAT,
+aug_2010 FLOAT,
+sep_2010 FLOAT,
+oct_2010 FLOAT,
+nov_2010 FLOAT,
+dec_2010 FLOAT,
+jan_2011 FLOAT,
+feb_2011 FLOAT,
+mar_2011 FLOAT,
+apr_2011 FLOAT,
+may_2011 FLOAT,
+jun_2011 FLOAT,
+jul_2011 FLOAT,
+aug_2011 FLOAT,
+sep_2011 FLOAT,
+oct_2011 FLOAT,
+nov_2011 FLOAT,
+dec_2011 FLOAT,
+jan_2012 FLOAT,
+feb_2012 FLOAT,
+mar_2012 FLOAT,
+apr_2012 FLOAT,
+may_2012 FLOAT,
+jun_2012 FLOAT,
+jul_2012 FLOAT,
+aug_2012 FLOAT,
+sep_2012 FLOAT,
+oct_2012 FLOAT,
+nov_2012 FLOAT,
+dec_2012 FLOAT,
+jan_2013 FLOAT,
+feb_2013 FLOAT,
+mar_2013 FLOAT,
+apr_2013 FLOAT,
+may_2013 FLOAT,
+jun_2013 FLOAT,
+jul_2013 FLOAT,
+aug_2013 FLOAT,
+sep_2013 FLOAT,
+oct_2013 FLOAT,
+nov_2013 FLOAT,
+dec_2013 FLOAT,
+jan_2014 FLOAT,
+feb_2014 FLOAT,
+mar_2014 FLOAT,
+apr_2014 FLOAT,
+may_2014 FLOAT,
+jun_2014 FLOAT,
+jul_2014 FLOAT,
+aug_2014 FLOAT,
+sep_2014 FLOAT,
+oct_2014 FLOAT,
+nov_2014 FLOAT,
+dec_2014 FLOAT,
+jan_2015 FLOAT,
+feb_2015 FLOAT,
+mar_2015 FLOAT,
+apr_2015 FLOAT,
+may_2015 FLOAT,
+jun_2015 FLOAT,
+jul_2015 FLOAT,
+aug_2015 FLOAT,
+sep_2015 FLOAT,
+oct_2015 FLOAT,
+nov_2015 FLOAT,
+dec_2015 FLOAT,
+jan_2016 FLOAT,
+feb_2016 FLOAT,
+mar_2016 FLOAT,
+apr_2016 FLOAT,
+may_2016 FLOAT,
+jun_2016 FLOAT,
+jul_2016 FLOAT,
+aug_2016 FLOAT,
+sep_2016 FLOAT,
+oct_2016 FLOAT,
+nov_2016 FLOAT,
+dec_2016 FLOAT,
+jan_2017 FLOAT,
+feb_2017 FLOAT,
+mar_2017 FLOAT,
+apr_2017 FLOAT,
+may_2017 FLOAT,
+jun_2017 FLOAT,
+jul_2017 FLOAT,
+aug_2017 FLOAT,
+sep_2017 FLOAT,
+oct_2017 FLOAT,
+nov_2017 FLOAT,
+dec_2017 FLOAT,
+jan_2018 FLOAT,
+feb_2018 FLOAT,
+mar_2018 FLOAT,
+apr_2018 FLOAT,
+may_2018 FLOAT,
+jun_2018 FLOAT,
+jul_2018 FLOAT,
+aug_2018 FLOAT,
+sep_2018 FLOAT,
+oct_2018 FLOAT,
+nov_2018 FLOAT,
+dec_2018 FLOAT,
+jan_2019 FLOAT,
+feb_2019 FLOAT,
+mar_2019 FLOAT,
+apr_2019 FLOAT,
+may_2019 FLOAT,
+jun_2019 FLOAT,
+jul_2019 FLOAT,
+aug_2019 FLOAT,
+sep_2019 FLOAT,
+oct_2019 FLOAT,
+nov_2019 FLOAT,
+dec_2019 FLOAT,
+jan_2020 FLOAT,
+feb_2020 FLOAT,
+mar_2020 FLOAT,
+apr_2020 FLOAT,
+may_2020 FLOAT,
+jun_2020 FLOAT,
+jul_2020 FLOAT,
+aug_2020 FLOAT,
+sep_2020 FLOAT,
+oct_2020 FLOAT,
+nov_2020 FLOAT,
+dec_2020 FLOAT,
+jan_2021 FLOAT,
+feb_2021 FLOAT,
+mar_2021 FLOAT,
+apr_2021 FLOAT,
+may_2021 FLOAT,
+jun_2021 FLOAT,
+jul_2021 FLOAT,
+aug_2021 FLOAT,
+sep_2021 FLOAT,
+oct_2021 FLOAT,
+nov_2021 FLOAT,
+dec_2021 FLOAT,
+jan_2022 FLOAT,
+feb_2022 FLOAT,
+mar_2022 FLOAT,
+apr_2022 FLOAT,
+may_2022 FLOAT,
+jun_2022 FLOAT,
+jul_2022 FLOAT,
+aug_2022 FLOAT,
+sep_2022 FLOAT,
+oct_2022 FLOAT,
+nov_2022 FLOAT,
+dec_2022 FLOAT,
+jan_2023 FLOAT,
+feb_2023 FLOAT,
+mar_2023 FLOAT,
+apr_2023 FLOAT,
+may_2023 FLOAT,
+jun_2023 FLOAT,
+jul_2023 FLOAT,
+aug_2023 FLOAT,
+sep_2023 FLOAT,
+oct_2023 FLOAT,
+nov_2023 FLOAT,
+dec_2023 FLOAT,
+jan_2024 FLOAT,
+feb_2024 FLOAT,
+mar_2024 FLOAT,
+apr_2024 FLOAT,
+may_2024 FLOAT,
+jun_2024 FLOAT,
+jul_2024 FLOAT,
+aug_2024 FLOAT,
+sep_2024 FLOAT,
+oct_2024 FLOAT,
+nov_2024 FLOAT,
+dec_2024 FLOAT,
+jan_2025 FLOAT,
+feb_2025 FLOAT,
+mar_2025 FLOAT
+);
+
+SET SQL_SAFE_UPDATES = 0;
+
+DELETE FROM staging_table
+WHERE
+    product_code IS NULL OR
+    material_name IS NULL OR
+    dec_2002 IS NULL OR
+    jan_2003 IS NULL OR
+    feb_2003 IS NULL OR
+    mar_2003 IS NULL OR
+    apr_2003 IS NULL OR
+    may_2003 IS NULL OR
+    jun_2003 IS NULL OR
+    jul_2003 IS NULL OR
+    aug_2003 IS NULL OR
+    sep_2003 IS NULL OR
+    oct_2003 IS NULL OR
+    nov_2003 IS NULL OR
+    dec_2003 IS NULL OR
+    jan_2004 IS NULL OR
+    feb_2004 IS NULL OR
+    mar_2004 IS NULL OR
+    apr_2004 IS NULL OR
+    may_2004 IS NULL OR
+    jun_2004 IS NULL OR
+    jul_2004 IS NULL OR
+    aug_2004 IS NULL OR
+    sep_2004 IS NULL OR
+    oct_2004 IS NULL OR
+    nov_2004 IS NULL OR
+    dec_2004 IS NULL OR
+    jan_2005 IS NULL OR
+    feb_2005 IS NULL OR
+    mar_2005 IS NULL OR
+    apr_2005 IS NULL OR
+    may_2005 IS NULL OR
+    jun_2005 IS NULL OR
+    jul_2005 IS NULL OR
+    aug_2005 IS NULL OR
+    sep_2005 IS NULL OR
+    oct_2005 IS NULL OR
+    nov_2005 IS NULL OR
+    dec_2005 IS NULL OR
+    jan_2006 IS NULL OR
+    feb_2006 IS NULL OR
+    mar_2006 IS NULL OR
+    apr_2006 IS NULL OR
+    may_2006 IS NULL OR
+    jun_2006 IS NULL OR
+    jul_2006 IS NULL OR
+    aug_2006 IS NULL OR
+    sep_2006 IS NULL OR
+    oct_2006 IS NULL OR
+    nov_2006 IS NULL OR
+    dec_2006 IS NULL OR
+    jan_2007 IS NULL OR
+    feb_2007 IS NULL OR
+    mar_2007 IS NULL OR
+    apr_2007 IS NULL OR
+    may_2007 IS NULL OR
+    jun_2007 IS NULL OR
+    jul_2007 IS NULL OR
+    aug_2007 IS NULL OR
+    sep_2007 IS NULL OR
+    oct_2007 IS NULL OR
+    nov_2007 IS NULL OR
+    dec_2007 IS NULL OR
+    jan_2008 IS NULL OR
+    feb_2008 IS NULL OR
+    mar_2008 IS NULL OR
+    apr_2008 IS NULL OR
+    may_2008 IS NULL OR
+    jun_2008 IS NULL OR
+    jul_2008 IS NULL OR
+    aug_2008 IS NULL OR
+    sep_2008 IS NULL OR
+    oct_2008 IS NULL OR
+    nov_2008 IS NULL OR
+    dec_2008 IS NULL OR
+    jan_2009 IS NULL OR
+    feb_2009 IS NULL OR
+    mar_2009 IS NULL OR
+    apr_2009 IS NULL OR
+    may_2009 IS NULL OR
+    jun_2009 IS NULL OR
+    jul_2009 IS NULL OR
+    aug_2009 IS NULL OR
+    sep_2009 IS NULL OR
+    oct_2009 IS NULL OR
+    nov_2009 IS NULL OR
+    dec_2009 IS NULL OR
+    jan_2010 IS NULL OR
+    feb_2010 IS NULL OR
+    mar_2010 IS NULL OR
+    apr_2010 IS NULL OR
+    may_2010 IS NULL OR
+    jun_2010 IS NULL OR
+    jul_2010 IS NULL OR
+    aug_2010 IS NULL OR
+    sep_2010 IS NULL OR
+    oct_2010 IS NULL OR
+    nov_2010 IS NULL OR
+    dec_2010 IS NULL OR
+    jan_2011 IS NULL OR
+    feb_2011 IS NULL OR
+    mar_2011 IS NULL OR
+    apr_2011 IS NULL OR
+    may_2011 IS NULL OR
+    jun_2011 IS NULL OR
+    jul_2011 IS NULL OR
+    aug_2011 IS NULL OR
+    sep_2011 IS NULL OR
+    oct_2011 IS NULL OR
+    nov_2011 IS NULL OR
+    dec_2011 IS NULL OR
+    jan_2012 IS NULL OR
+    feb_2012 IS NULL OR
+    mar_2012 IS NULL OR
+    apr_2012 IS NULL OR
+    may_2012 IS NULL OR
+    jun_2012 IS NULL OR
+    jul_2012 IS NULL OR
+    aug_2012 IS NULL OR
+    sep_2012 IS NULL OR
+    oct_2012 IS NULL OR
+    nov_2012 IS NULL OR
+    dec_2012 IS NULL OR
+    jan_2013 IS NULL OR
+    feb_2013 IS NULL OR
+    mar_2013 IS NULL OR
+    apr_2013 IS NULL OR
+    may_2013 IS NULL OR
+    jun_2013 IS NULL OR
+    jul_2013 IS NULL OR
+    aug_2013 IS NULL OR
+    sep_2013 IS NULL OR
+    oct_2013 IS NULL OR
+    nov_2013 IS NULL OR
+    dec_2013 IS NULL OR
+    jan_2014 IS NULL OR
+    feb_2014 IS NULL OR
+    mar_2014 IS NULL OR
+    apr_2014 IS NULL OR
+    may_2014 IS NULL OR
+    jun_2014 IS NULL OR
+    jul_2014 IS NULL OR
+    aug_2014 IS NULL OR
+    sep_2014 IS NULL OR
+    oct_2014 IS NULL OR
+    nov_2014 IS NULL OR
+    dec_2014 IS NULL OR
+    jan_2015 IS NULL OR
+    feb_2015 IS NULL OR
+    mar_2015 IS NULL OR
+    apr_2015 IS NULL OR
+    may_2015 IS NULL OR
+    jun_2015 IS NULL OR
+    jul_2015 IS NULL OR
+    aug_2015 IS NULL OR
+    sep_2015 IS NULL OR
+    oct_2015 IS NULL OR
+    nov_2015 IS NULL OR
+    dec_2015 IS NULL OR
+    jan_2016 IS NULL OR
+    feb_2016 IS NULL OR
+    mar_2016 IS NULL OR
+    apr_2016 IS NULL OR
+    may_2016 IS NULL OR
+    jun_2016 IS NULL OR
+    jul_2016 IS NULL OR
+    aug_2016 IS NULL OR
+    sep_2016 IS NULL OR
+    oct_2016 IS NULL OR
+    nov_2016 IS NULL OR
+    dec_2016 IS NULL OR
+    jan_2017 IS NULL OR
+    feb_2017 IS NULL OR
+    mar_2017 IS NULL OR
+    apr_2017 IS NULL OR
+    may_2017 IS NULL OR
+    jun_2017 IS NULL OR
+    jul_2017 IS NULL OR
+    aug_2017 IS NULL OR
+    sep_2017 IS NULL OR
+    oct_2017 IS NULL OR
+    nov_2017 IS NULL OR
+    dec_2017 IS NULL OR
+    jan_2018 IS NULL OR
+    feb_2018 IS NULL OR
+    mar_2018 IS NULL OR
+    apr_2018 IS NULL OR
+    may_2018 IS NULL OR
+    jun_2018 IS NULL OR
+    jul_2018 IS NULL OR
+    aug_2018 IS NULL OR
+    sep_2018 IS NULL OR
+    oct_2018 IS NULL OR
+    nov_2018 IS NULL OR
+    dec_2018 IS NULL OR
+    jan_2019 IS NULL OR
+    feb_2019 IS NULL OR
+    mar_2019 IS NULL OR
+    apr_2019 IS NULL OR
+    may_2019 IS NULL OR
+    jun_2019 IS NULL OR
+    jul_2019 IS NULL OR
+    aug_2019 IS NULL OR
+    sep_2019 IS NULL OR
+    oct_2019 IS NULL OR
+    nov_2019 IS NULL OR
+    dec_2019 IS NULL OR
+    jan_2020 IS NULL OR
+    feb_2020 IS NULL OR
+    mar_2020 IS NULL OR
+    apr_2020 IS NULL OR
+    may_2020 IS NULL OR
+    jun_2020 IS NULL OR
+    jul_2020 IS NULL OR
+    aug_2020 IS NULL OR
+    sep_2020 IS NULL OR
+    oct_2020 IS NULL OR
+    nov_2020 IS NULL OR
+    dec_2020 IS NULL OR
+    jan_2021 IS NULL OR
+    feb_2021 IS NULL OR
+    mar_2021 IS NULL OR
+    apr_2021 IS NULL OR
+    may_2021 IS NULL OR
+    jun_2021 IS NULL OR
+    jul_2021 IS NULL OR
+    aug_2021 IS NULL OR
+    sep_2021 IS NULL OR
+    oct_2021 IS NULL OR
+    nov_2021 IS NULL OR
+    dec_2021 IS NULL OR
+    jan_2022 IS NULL OR
+    feb_2022 IS NULL OR
+    mar_2022 IS NULL OR
+    apr_2022 IS NULL OR
+    may_2022 IS NULL OR
+    jun_2022 IS NULL OR
+    jul_2022 IS NULL OR
+    aug_2022 IS NULL OR
+    sep_2022 IS NULL OR
+    oct_2022 IS NULL OR
+    nov_2022 IS NULL OR
+    dec_2022 IS NULL OR
+    jan_2023 IS NULL OR
+    feb_2023 IS NULL OR
+    mar_2023 IS NULL OR
+    apr_2023 IS NULL OR
+    may_2023 IS NULL OR
+    jun_2023 IS NULL OR
+    jul_2023 IS NULL OR
+    aug_2023 IS NULL OR
+    sep_2023 IS NULL OR
+    oct_2023 IS NULL OR
+    nov_2023 IS NULL OR
+    dec_2023 IS NULL OR
+    jan_2024 IS NULL OR
+    feb_2024 IS NULL OR
+    mar_2024 IS NULL OR
+    apr_2024 IS NULL OR
+    may_2024 IS NULL OR
+    jun_2024 IS NULL OR
+    jul_2024 IS NULL OR
+    aug_2024 IS NULL OR
+    sep_2024 IS NULL OR
+    oct_2024 IS NULL OR
+    nov_2024 IS NULL OR
+    dec_2024 IS NULL OR
+    jan_2025 IS NULL OR
+    feb_2025 IS NULL OR
+    mar_2025 IS NULL;
+
+
+CREATE TABLE MaterialPrices(
+MaterialID INT AUTO_INCREMENT PRIMARY KEY,
+Material TEXT,
+Month_y DATE,
+Price INTEGER);
+
+
+
+CREATE TABLE sustainability_table (
+  ID INT AUTO_INCREMENT PRIMARY KEY,
+  UU_ID CHAR(255),
+  material_name TEXT(255),
+  No_ID FLOAT,
+  Entsorgung TEXT(255),
+  Volume_Mass FLOAT, 
+  Ref_unit CHAR(10),
+  UBP_Total FLOAT,
+  Fabrication_UBP FLOAT,
+  Eliminator_UBP FLOAT,
+  Total_kWH FLOAT,
+  Total_kWH_fabrication FLOAT,
+  Energy_fabrication_kWH FLOAT,
+  Material_fabrication_kWH FLOAT,
+  Elimination_kWH FLOAT,
+  Total_co2_emission FLOAT,
+  Co2_fabrication FLOAT,
+  Co2_elimination_kg FLOAT,
+  Biogener_in_product_kg FLOAT
+);
+
+
+
+CREATE TABLE category_matches (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    category VARCHAR(255),     -- Wall, Window, or Door
+    data1_product VARCHAR(255), -- Corresponding data from data1
+    data2_product VARCHAR(255)  -- Corresponding data from data2
+);
+

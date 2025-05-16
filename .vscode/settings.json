@@ -1,0 +1,19 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled",
+                "localInfile": true,
+                "streamFactory": "fs.createReadStream"
+            },
+            "previewLimit": 50,
+            "server": "127.0.0.1",
+            "port": 3306,
+            "driver": "MySQL",
+            "database": "ifcdb",
+            "username": "root",
+            "name": "IFC_database"
+        }
+    ]
+}
